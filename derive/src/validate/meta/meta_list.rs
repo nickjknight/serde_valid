@@ -33,7 +33,7 @@ pub fn extract_validator_from_meta_list(
 
     if nested.len() > 0 {
         let meta_item = &nested[0];
-        match meta_item {
+        let validator = match meta_item {
             syn::NestedMeta::Meta(meta) => match meta {
                 syn::Meta::Path(path) => {
                     extract_validator_from_nested_meta_path(field, path, messaeg_fn, rename_map)
@@ -44,18 +44,23 @@ pub fn extract_validator_from_meta_list(
                 syn::Meta::NameValue(name_value) => extract_validator_from_nested_meta_name_value(
                     field, attribute, name_value, messaeg_fn, rename_map,
                 ),
-            }
-            .map_err(|validator_errors| {
-                errors.extend(validator_errors);
-                errors
-            }),
+            },
             syn::NestedMeta::Lit(lit) => {
-                errors.push(crate::Error::validate_meta_literal_not_support(lit));
-                Err(errors)
+                Err(vec![crate::Error::validate_meta_literal_not_support(lit)])
             }
         }
+        .map_err(|validator_errors| {
+            errors.extend(validator_errors);
+            vec![]
+        });
+
+        if errors.is_empty() {
+            validator
+        } else {
+            Err(errors)
+        }
     } else {
-        errors.push(crate::Error::validate_type_required_error(attribute));
+        errors.push(crate::Error::validate_need_type(attribute));
         Err(errors)
     }
 }

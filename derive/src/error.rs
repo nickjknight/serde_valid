@@ -111,8 +111,11 @@ impl Error {
         )
     }
 
-    pub fn validate_type_required_error(attribute: &syn::Attribute) -> Self {
-        Self::new(attribute.span(), "#[validate(???)] needs validation type.")
+    pub fn validate_need_type(attribute: &syn::Attribute) -> Self {
+        Self::new(
+            attribute.path.span(),
+            "#[validate(???)] needs validation type.",
+        )
     }
 
     pub fn validate_unknown_type(path: &syn::Path, unknown: &str, candidates: &[&str]) -> Self {
