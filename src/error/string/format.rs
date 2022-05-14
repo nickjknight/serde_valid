@@ -6,10 +6,8 @@ pub struct FormatErrorParams {
 }
 
 impl FormatErrorParams {
-    pub fn new(format: &str) -> Self {
-        Self {
-            format: format.to_owned(),
-        }
+    pub fn new(format: String) -> Self {
+        Self { format: format }
     }
 
     #[allow(dead_code)]

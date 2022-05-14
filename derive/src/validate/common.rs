@@ -69,6 +69,7 @@ macro_rules! enum_str {
 
 enum_str! {
     pub enum MetaListValidation {
+        Format = "format",
         Enumerate = "enumerate",
         Custom = "custom",
     }

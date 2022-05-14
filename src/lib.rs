@@ -259,14 +259,14 @@ pub mod validation;
 
 pub use error::{
     EnumerateErrorParams, Error, ExclusiveMaximumErrorParams, ExclusiveMinimumErrorParams,
-    MaxItemsErrorParams, MaxLengthErrorParams, MaxPropertiesErrorParams, MaximumErrorParams,
-    MinItemsErrorParams, MinLengthErrorParams, MinPropertiesErrorParams, MinimumErrorParams,
-    MultipleOfErrorParams, PatternErrorParams, UniqueItemsErrorParams,
+    FormatErrorParams, MaxItemsErrorParams, MaxLengthErrorParams, MaxPropertiesErrorParams,
+    MaximumErrorParams, MinItemsErrorParams, MinLengthErrorParams, MinPropertiesErrorParams,
+    MinimumErrorParams, MultipleOfErrorParams, PatternErrorParams, UniqueItemsErrorParams,
 };
 pub use validation::{
-    ValidateEnumerate, ValidateExclusiveMaximum, ValidateExclusiveMinimum, ValidateMaxItems,
-    ValidateMaxLength, ValidateMaxProperties, ValidateMaximum, ValidateMinItems, ValidateMinLength,
-    ValidateMinProperties, ValidateMinimum, ValidateMultipleOf, ValidatePattern,
+    ValidateEnumerate, ValidateExclusiveMaximum, ValidateExclusiveMinimum, ValidateFormat,
+    ValidateMaxItems, ValidateMaxLength, ValidateMaxProperties, ValidateMaximum, ValidateMinItems,
+    ValidateMinLength, ValidateMinProperties, ValidateMinimum, ValidateMultipleOf, ValidatePattern,
     ValidateUniqueItems,
 };
 

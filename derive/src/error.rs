@@ -126,20 +126,40 @@ impl Error {
         )
     }
 
+    pub fn validate_format_need_item(path: &syn::Path) -> Self {
+        Self::new(path.span(), format!("#[validate(format(???))] need items."))
+    }
+
+    pub fn validate_format_tail_error(nested: &CommaSeparatedNestedMetas) -> Self {
+        Self::new(
+            nested.span(),
+            format!("#[validate(format(???))] support only 1 item."),
+        )
+    }
+
     pub fn validate_enumerate_need_item(path: &syn::Path) -> Self {
-        Self::new(path.span(), format!("`enumerate` need items."))
+        Self::new(
+            path.span(),
+            format!("#[validate(enumerate(???, ...))] need items."),
+        )
     }
 
     pub fn validate_custom_need_item(path: &syn::Path) -> Self {
-        Self::new(path.span(), format!("`custom` need items."))
+        Self::new(path.span(), format!("#[validate(custom(???))] need items."))
     }
 
     pub fn validate_custom_tail_error(nested: &CommaSeparatedNestedMetas) -> Self {
-        Self::new(nested.span(), format!("`custom` support only 1 item."))
+        Self::new(
+            nested.span(),
+            format!("#[validate(custom(???))] support only 1 item."),
+        )
     }
 
     pub fn message_fn_need_item(path: &syn::Path) -> Self {
-        Self::new(path.span(), format!("`message_fn` need items."))
+        Self::new(
+            path.span(),
+            format!("#[validate(..., message_fn(???))] need items."),
+        )
     }
 
     pub fn message_fn_allow_name_path(nested_meta: &syn::NestedMeta) -> Self {
@@ -152,7 +172,7 @@ impl Error {
     pub fn message_fn_tail_error(nested_meta: &syn::NestedMeta) -> Self {
         Self::new(
             nested_meta.span(),
-            format!("`message_fn` support only 1 item."),
+            format!("#[validate(..., message_fn(???))] support only 1 item."),
         )
     }
 

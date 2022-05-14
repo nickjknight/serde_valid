@@ -2,87 +2,78 @@ use crate::error::FormatErrorParams;
 
 /// Format validation of the string.
 ///
-/// See <https://json-schema.org/understanding-json-schema/reference/string.html#format>
-pub trait ValidateFormat {
-    fn validate_format(&self, format: &str) -> Result<(), FormatErrorParams>;
+/// See [JsonSchema String Format](https://json-schema.org/understanding-json-schema/reference/string.html#format)
+pub trait ValidateFormat<T: ?Sized> {
+    fn validate_format<F: FnOnce(&T) -> Result<(), String>>(
+        &self,
+        validate_fn: F,
+    ) -> Result<(), FormatErrorParams>;
 }
+
+macro_rules! impl_validate_string_format {
+    ($ty:ty, $ref:ty) => {
+        impl ValidateFormat<$ref> for $ty {
+            fn validate_format<F: FnOnce(&$ref) -> Result<(), String>>(
+                &self,
+                validate_fn: F,
+            ) -> Result<(), FormatErrorParams> {
+                match validate_fn(self) {
+                    Ok(_) => Ok(()),
+                    Err(format) => Err(FormatErrorParams::new(format)),
+                }
+            }
+        }
+    };
+}
+
+impl_validate_string_format!(str, str);
+impl_validate_string_format!(&str, str);
+impl_validate_string_format!(String, str);
+impl_validate_string_format!(std::borrow::Cow<'_, str>, str);
+impl_validate_string_format!(std::ffi::OsStr, std::ffi::OsStr);
+impl_validate_string_format!(&std::ffi::OsStr, std::ffi::OsStr);
+impl_validate_string_format!(std::ffi::OsString, std::ffi::OsStr);
+impl_validate_string_format!(std::borrow::Cow<'_, std::ffi::OsStr>, std::ffi::OsStr);
+impl_validate_string_format!(std::path::Path, std::path::Path);
+impl_validate_string_format!(&std::path::Path, std::path::Path);
+impl_validate_string_format!(std::path::PathBuf, std::path::Path);
+impl_validate_string_format!(std::borrow::Cow<'_, std::path::Path>, std::path::Path);
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::borrow::Cow;
-    use std::ffi::{OsStr, OsString};
-    use std::path::{Path, PathBuf};
+
+    fn validate_gmail(gmail: &str) -> Result<(), String> {
+        if gmail.ends_with("@gmail.co.jp") {
+            Ok(())
+        } else {
+            Err("gmail".to_string())
+        }
+    }
 
     #[test]
     fn test_validate_string_format_str_type() {
-        assert!(ValidateFormat::validate_format(
-            "2020-09-10",
-            &str::new(r"^\d{4}-\d{2}-\d{2}$").unwrap()
-        )
-        .is_ok());
+        assert!("user@gmail.co.jp".validate_format(validate_gmail).is_ok());
+    }
+
+    #[test]
+    fn test_validate_string_format_ref_str_type() {
+        assert!((&"user@gmail.co.jp")
+            .validate_format(validate_gmail)
+            .is_ok());
     }
 
     #[test]
     fn test_validate_string_format_string_type() {
-        assert!(ValidateFormat::validate_format(
-            &String::from("2020-09-10"),
-            &str::new(r"^\d{4}-\d{2}-\d{2}$").unwrap()
-        )
-        .is_ok());
+        assert!(String::from("user@gmail.co.jp")
+            .validate_format(validate_gmail)
+            .is_ok());
     }
 
     #[test]
     fn test_validate_string_format_cow_str_type() {
-        assert!(ValidateFormat::validate_format(
-            &Cow::from("2020-09-10"),
-            &str::new(r"^\d{4}-\d{2}-\d{2}$").unwrap()
-        )
-        .is_ok());
-    }
-
-    #[test]
-    fn test_validate_string_format_os_str_type() {
-        assert!(ValidateFormat::validate_format(
-            OsStr::new("2020-09-10"),
-            &str::new(r"^\d{4}-\d{2}-\d{2}$").unwrap()
-        )
-        .is_ok());
-    }
-
-    #[test]
-    fn test_validate_string_format_os_string_type() {
-        assert!(ValidateFormat::validate_format(
-            &OsString::from("2020-09-10"),
-            &str::new(r"^\d{4}-\d{2}-\d{2}$").unwrap()
-        )
-        .is_ok());
-    }
-
-    #[test]
-    fn test_validate_string_format_path_type() {
-        assert!(ValidateFormat::validate_format(
-            Path::new("./foo/bar.txt"),
-            &str::new(r"^*.txt$").unwrap()
-        )
-        .is_ok());
-    }
-
-    #[test]
-    fn test_validate_string_format_path_buf_type() {
-        assert!(ValidateFormat::validate_format(
-            &PathBuf::from("./foo/bar.txt"),
-            &str::new(r"^*.txt$").unwrap()
-        )
-        .is_ok());
-    }
-
-    #[test]
-    fn test_validate_string_format_is_false() {
-        assert!(ValidateFormat::validate_format(
-            "2020/09/10",
-            &str::new(r"^\d{4}-\d{2}-\d{2}$").unwrap()
-        )
-        .is_err());
+        assert!(std::borrow::Cow::from("user@gmail.co.jp")
+            .validate_format(validate_gmail)
+            .is_ok());
     }
 }

@@ -1,8 +1,9 @@
 pub use crate::error::{
     EnumerateErrorParams, ExclusiveMaximumErrorParams, ExclusiveMinimumErrorParams,
-    MaxItemsErrorParams, MaxLengthErrorParams, MaxPropertiesErrorParams, MaximumErrorParams,
-    Message, MinItemsErrorParams, MinLengthErrorParams, MinPropertiesErrorParams,
-    MinimumErrorParams, MultipleOfErrorParams, PatternErrorParams, UniqueItemsErrorParams,
+    FormatErrorParams, MaxItemsErrorParams, MaxLengthErrorParams, MaxPropertiesErrorParams,
+    MaximumErrorParams, Message, MinItemsErrorParams, MinLengthErrorParams,
+    MinPropertiesErrorParams, MinimumErrorParams, MultipleOfErrorParams, PatternErrorParams,
+    UniqueItemsErrorParams,
 };
 use std::{collections::HashMap, fmt::Debug};
 
@@ -36,6 +37,10 @@ pub enum Error {
     #[error("{0}")]
     #[serde(serialize_with = "serialize_error_message")]
     MaxLength(Message<MaxLengthErrorParams>),
+
+    #[error("{0}")]
+    #[serde(serialize_with = "serialize_error_message")]
+    Format(Message<FormatErrorParams>),
 
     #[error("{0}")]
     #[serde(serialize_with = "serialize_error_message")]
