@@ -14,7 +14,9 @@ pub use numeric::{
     MinimumErrorParams, MultipleOfErrorParams,
 };
 pub use object::{MaxPropertiesErrorParams, MinPropertiesErrorParams};
-pub use string::{MaxLengthErrorParams, MinLengthErrorParams, PatternErrorParams};
+pub use string::{
+    FormatErrorParams, MaxLengthErrorParams, MinLengthErrorParams, PatternErrorParams,
+};
 
 #[derive(Debug, thiserror::Error)]
 pub enum Error<E>

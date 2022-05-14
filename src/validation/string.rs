@@ -1,3 +1,4 @@
+mod format;
 mod max_length;
 mod min_length;
 mod pattern;
