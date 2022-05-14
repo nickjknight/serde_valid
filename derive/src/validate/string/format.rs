@@ -7,24 +7,50 @@ use quote::quote;
 
 pub fn extract_string_format_validator(
     field: &impl Field,
-    syn::MetaList { path, nested, .. }: &syn::MetaList,
+    meta_list: &syn::MetaList,
     message_fn: Option<TokenStream>,
     rename_map: &HashMap<String, String>,
 ) -> Result<Validator, crate::Errors> {
+    if let Some(array_field) = field.array_field() {
+        Ok(Validator::Array(Box::new(extract_string_format_validator(
+            &array_field,
+            meta_list,
+            message_fn,
+            rename_map,
+        )?)))
+    } else if let Some(option_field) = field.option_field() {
+        Ok(Validator::Option(Box::new(
+            extract_string_format_validator(&option_field, meta_list, message_fn, rename_map)?,
+        )))
+    } else {
+        Ok(Validator::Normal(inner_extract_string_format_validator(
+            field, meta_list, message_fn, rename_map,
+        )?))
+    }
+}
+
+fn inner_extract_string_format_validator(
+    field: &impl Field,
+    syn::MetaList { path, nested, .. }: &syn::MetaList,
+    message_fn: Option<TokenStream>,
+    rename_map: &HashMap<String, String>,
+) -> Result<TokenStream, crate::Errors> {
     let field_name = field.name();
     let field_ident = field.ident();
     let rename = rename_map.get(field_name).unwrap_or(field_name);
     let format_fn_name = match nested.len() {
-        0 => Err(crate::Error::validate_format_need_item(path)),
-        1 => extract_format_fn_name(&nested[0]),
-        _ => Err(crate::Error::validate_format_tail_error(&nested)),
-    }
-    .map_err(|error| vec![error])?;
+        0 => Err(vec![crate::Error::validate_format_need_item(path)]),
+        1 => extract_format_fn_name(&nested[0]).map_err(|error| vec![error]),
+        _ => Err(nested
+            .iter()
+            .skip(1)
+            .map(|arg| crate::Error::validate_format_tail_error(arg))
+            .collect()),
+    }?;
     let message =
         message_fn.unwrap_or(quote!(::serde_valid::FormatErrorParams::to_default_message));
 
-    Ok(Validator::Normal(quote!(
-
+    Ok(quote!(
         if let Err(error_params) = ::serde_valid::ValidateFormat::<_>::validate_format(#field_ident, #format_fn_name) {
             use ::serde_valid::error::ToDefaultMessage;
             __errors
@@ -37,7 +63,7 @@ pub fn extract_string_format_validator(
                     )
                 ));
         };
-    )))
+    ))
 }
 
 fn extract_format_fn_name(nested_meta: &syn::NestedMeta) -> Result<TokenStream, crate::Error> {

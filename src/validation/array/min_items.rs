@@ -1,6 +1,6 @@
 /// Min length validation of the array items.
 ///
-/// See <https://json-schema.org/understanding-json-schema/reference/array.html#length>
+/// See [JsonSchema Array Length](https://json-schema.org/understanding-json-schema/reference/array.html#length)
 pub trait ValidateMinItems {
     fn validate_min_items(&self, min_items: usize) -> Result<(), crate::MinItemsErrorParams>;
 }

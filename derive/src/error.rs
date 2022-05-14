@@ -2,8 +2,6 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::spanned::Spanned;
 
-use crate::types::CommaSeparatedNestedMetas;
-
 pub fn fields_errors_tokens() -> TokenStream {
     quote!(::serde_valid::validation::Errors::Fields(__errors))
 }
@@ -127,12 +125,15 @@ impl Error {
     }
 
     pub fn validate_format_need_item(path: &syn::Path) -> Self {
-        Self::new(path.span(), format!("#[validate(format(???))] need items."))
+        Self::new(
+            path.span(),
+            format!("#[validate(format(???))] need format_fn."),
+        )
     }
 
-    pub fn validate_format_tail_error(nested: &CommaSeparatedNestedMetas) -> Self {
+    pub fn validate_format_tail_error(nested_meta: &syn::NestedMeta) -> Self {
         Self::new(
-            nested.span(),
+            nested_meta.span(),
             format!("#[validate(format(???))] support only 1 item."),
         )
     }
@@ -145,12 +146,15 @@ impl Error {
     }
 
     pub fn validate_custom_need_item(path: &syn::Path) -> Self {
-        Self::new(path.span(), format!("#[validate(custom(???))] need items."))
+        Self::new(
+            path.span(),
+            format!("#[validate(custom(???))] need custom_fn."),
+        )
     }
 
-    pub fn validate_custom_tail_error(nested: &CommaSeparatedNestedMetas) -> Self {
+    pub fn validate_custom_tail_error(nested_meta: &syn::NestedMeta) -> Self {
         Self::new(
-            nested.span(),
+            nested_meta.span(),
             format!("#[validate(custom(???))] support only 1 item."),
         )
     }

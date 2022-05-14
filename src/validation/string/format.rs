@@ -3,6 +3,41 @@ use crate::error::FormatErrorParams;
 /// Format validation of the string.
 ///
 /// See [JsonSchema String Format](https://json-schema.org/understanding-json-schema/reference/string.html#format)
+///
+/// ```rust
+/// use serde_valid::{Validate, ValidateFormat};
+///
+/// struct MyType(String);
+///
+/// impl ValidateFormat<str> for MyType {
+///     fn validate_format<F: FnOnce(&str) -> Result<(), String>>(
+///         &self,
+///         validate_fn: F,
+///     ) -> Result<(), serde_valid::FormatErrorParams> {
+///         self.0.validate_format(validate_fn)
+///     }
+/// }
+///
+/// fn gmail(gmail: &str) -> Result<(), String> {
+///     if gmail.ends_with("@gmail.com") {
+///         Ok(())
+///     } else {
+///         Err("gmail".to_owned())
+///     }
+/// }
+///
+/// #[derive(Validate)]
+/// struct SampleStruct {
+///     #[validate(format(gmail))]
+///     val: MyType,
+/// }
+///
+/// let s = SampleStruct {
+///     val: MyType(String::from("user@gmail.com")),
+/// };
+///
+/// assert!(s.validate().is_ok());
+/// ```
 pub trait ValidateFormat<T: ?Sized> {
     fn validate_format<F: FnOnce(&T) -> Result<(), String>>(
         &self,

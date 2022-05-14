@@ -15,11 +15,14 @@ pub fn extract_generic_custom_validator(
     let rename = rename_map.get(field_name).unwrap_or(field_name);
 
     let custom_fn_name = match nested.len() {
-        0 => Err(crate::Error::validate_custom_need_item(path)),
-        1 => extract_custom_fn_name(&nested[0]),
-        _ => Err(crate::Error::validate_custom_tail_error(&nested)),
-    }
-    .map_err(|error| vec![error])?;
+        0 => Err(vec![crate::Error::validate_custom_need_item(path)]),
+        1 => extract_custom_fn_name(&nested[0]).map_err(|error| vec![error]),
+        _ => Err(nested
+            .iter()
+            .skip(1)
+            .map(|arg| crate::Error::validate_custom_tail_error(arg))
+            .collect()),
+    }?;
 
     Ok(Validator::Normal(quote!(
         if let Err(__error) = #custom_fn_name(#field_ident) {
