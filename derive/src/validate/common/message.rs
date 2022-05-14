@@ -19,10 +19,7 @@ pub fn extract_message_fn_tokens(
             syn::Meta::Path(path) => {
                 let path_label = SingleIdentPath::new(path).ident().to_string();
                 if MetaNameValueMessage::from_str(&path_label).is_ok() {
-                    Err(crate::Error::validate_meta_name_value_need_value(
-                        path,
-                        &path_label,
-                    ))
+                    Err(crate::Error::message_need_str(path))
                 } else if MetaListMessage::from_str(&path_label).is_ok() {
                     Err(crate::Error::validate_meta_list_need_value(
                         path,

@@ -162,10 +162,17 @@ impl Error {
         )
     }
 
+    pub fn message_need_str(path: &syn::Path) -> Self {
+        Self::new(
+            path.span(),
+            format!("#[validate(..., message = ???)] need message str."),
+        )
+    }
+
     pub fn message_fn_need_item(path: &syn::Path) -> Self {
         Self::new(
             path.span(),
-            format!("#[validate(..., message_fn(???))] need items."),
+            format!("#[validate(..., message_fn(???))] need message_fn."),
         )
     }
 
