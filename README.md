@@ -47,6 +47,7 @@ Serde Valid support standard validation based JSON Schema.
 | :---: | :--- | :--- |
 | String | `#[validate(max_length = 5)]` | [maxLength](https://json-schema.org/understanding-json-schema/reference/string.html#length) |
 | String | `#[validate(min_length = 5)]` | [minLength](https://json-schema.org/understanding-json-schema/reference/string.html#length) |
+| String | `#[validate(format(function))]` | [format](https://json-schema.org/understanding-json-schema/reference/string.html#format) |
 | String | `#[validate(pattern = r"^\d{5}$")]` | [pattern](https://json-schema.org/understanding-json-schema/reference/string.html#regular-expressions) |
 | Numeric | `#[validate(maximum = 5)]` | [maximum](https://json-schema.org/understanding-json-schema/reference/numeric.html#range) |
 | Numeric | `#[validate(minimum = 5)]` | [minimum](https://json-schema.org/understanding-json-schema/reference/numeric.html#range) |
